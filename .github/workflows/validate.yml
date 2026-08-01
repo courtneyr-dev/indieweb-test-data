@@ -1,0 +1,60 @@
+name: Validate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: XML is well-formed
+        run: |
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+          for f in sorted(glob.glob('*.xml')):
+              ET.parse(f)
+              print(f'ok {f}')
+          PY
+
+      - name: Committed XML matches the generator
+        run: |
+          python3 bin/generate.py > /tmp/generic.xml
+          python3 bin/generate.py --layer extended > /tmp/extended.xml
+          python3 bin/generate.py --no-matrix > /tmp/small.xml
+          diff -q /tmp/generic.xml  indieweb-test-data.xml
+          diff -q /tmp/extended.xml indieweb-test-data-extended.xml
+          diff -q /tmp/small.xml    indieweb-test-data-small.xml
+          echo "generated output matches what is committed"
+
+      - name: Coverage assertions
+        run: |
+          python3 - <<'PY'
+          import csv, re
+          fmts  = [r['slug'] for r in csv.DictReader(open('data/formats.csv'))]
+          kinds = [r['slug'] for r in csv.DictReader(open('data/kinds.csv'))]
+          xfn   = [r['value'] for r in csv.DictReader(open('data/xfn.csv'))]
+          x = open('indieweb-test-data.xml').read()
+          missing = []
+          for k in kinds:
+              if f'nicename="{k}"' not in x: missing.append(f'kind {k}')
+          for f in fmts:
+              if f != 'standard' and f'post-format-{f}' not in x: missing.append(f'format {f}')
+          for v in xfn:
+              if f'rel="{v}"' not in x and f'{v} ' not in x: missing.append(f'xfn {v}')
+          assert not missing, f'missing from corpus: {missing}'
+          expected = len(fmts) * len(kinds)
+          got = len(re.findall(r'matrix-', x))
+          assert got >= expected, f'matrix has {got} entries, expected at least {expected}'
+          print(f'{len(fmts)} formats, {len(kinds)} kinds, {len(xfn)} XFN values, {expected}-cell matrix — all present')
+          PY

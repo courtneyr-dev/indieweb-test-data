@@ -1,0 +1,11 @@
+slug,label,notes
+standard,Standard,No post-format term is set; this is the absence of a format
+aside,Aside,Short note without a title
+chat,Chat,Transcript-style content
+gallery,Gallery,Multiple images
+link,Link,Points at another URL
+image,Image,A single image
+quote,Quote,Quotation with attribution
+status,Status,Short status update
+video,Video,Video content
+audio,Audio,Audio content

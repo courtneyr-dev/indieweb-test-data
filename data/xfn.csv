@@ -1,0 +1,19 @@
+value,group,notes
+contact,friendship,Values within a group are mutually exclusive
+acquaintance,friendship,
+friend,friendship,
+met,physical,Have met in person
+co-worker,profession,
+colleague,profession,
+co-resident,geographical,
+neighbor,geographical,
+child,family,
+parent,family,
+sibling,family,
+spouse,family,
+kin,family,
+muse,romantic,
+crush,romantic,
+date,romantic,
+sweetheart,romantic,
+me,identity,Another profile belonging to the same person

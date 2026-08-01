@@ -1,0 +1,25 @@
+slug,label,response,notes
+acquisition,Acquisition,yes,Acquired something
+article,Article,no,Long-form post with a title
+bookmark,Bookmark,yes,Saved a URL for later
+checkin,Checkin,no,Location; carries venue and geo data
+drink,Drink,no,Consumed a drink
+eat,Eat,no,Consumed food
+event,Event,no,An event listing
+favorite,Favorite,yes,Marked something as a favorite
+jam,Jam,yes,A track worth sharing
+like,Like,yes,Liked a URL
+listen,Listen,yes,Listened to audio
+mood,Mood,no,Current mood
+note,Note,no,Short untitled post
+photo,Photo,no,A photograph
+play,Play,yes,Played a game
+read,Read,yes,Read a book or article
+recipe,Recipe,no,A recipe
+reply,Reply,yes,A response to a URL
+repost,Repost,yes,Republished a URL
+review,Review,yes,Reviewed something
+rsvp,RSVP,yes,Responded to an event invitation
+video,Video,no,Video content
+watch,Watch,yes,Watched video
+wish,Wish,yes,Wants something
