@@ -1,12 +1,21 @@
 slug,label,response,notes
 acquisition,Acquisition,yes,Acquired something
 article,Article,no,Long-form post with a title
+audio,Audio,no,"Audio you published — episode, recording, voice note"
 bookmark,Bookmark,yes,Saved a URL for later
 checkin,Checkin,no,Location; carries venue and geo data
+chicken,Chicken,no,A chicken post — see indieweb.org/chicken
+collection,Collection,no,A curated set of posts or items
+comics,Comics,no,A comic strip or panel you published
+craft,Craft,yes,"Something made by hand, citing the pattern or plan"
 drink,Drink,no,Consumed a drink
 eat,Eat,no,Consumed food
 event,Event,no,An event listing
+exercise,Exercise,no,"A workout — activity, distance, duration"
 favorite,Favorite,yes,Marked something as a favorite
+follow,Follow,yes,Started following someone
+issue,Issue,yes,Filed against a repository; cites it as in-reply-to
+itinerary,Itinerary,no,Planned route with legs and times
 jam,Jam,yes,A track worth sharing
 like,Like,yes,Liked a URL
 listen,Listen,yes,Listened to audio
@@ -14,12 +23,19 @@ mood,Mood,no,Current mood
 note,Note,no,Short untitled post
 photo,Photo,no,A photograph
 play,Play,yes,Played a game
+presentation,Presentation,no,A talk or slide deck you gave
+question,Question,no,A question posed to readers
+quote,Quote,yes,A quoted excerpt with attribution
 read,Read,yes,Read a book or article
 recipe,Recipe,no,A recipe
 reply,Reply,yes,A response to a URL
 repost,Repost,yes,Republished a URL
 review,Review,yes,Reviewed something
 rsvp,RSVP,yes,Responded to an event invitation
+sleep,Sleep,no,Sleep duration and quality
+tag,Tag,yes,Tagging someone or something at a URL
+trip,Trip,no,A journey taken
 video,Video,no,Video content
 watch,Watch,yes,Watched video
+weather,Weather,no,Conditions observed at post time
 wish,Wish,yes,Wants something

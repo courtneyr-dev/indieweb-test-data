@@ -18,9 +18,9 @@ wp import indieweb-test-data.xml --authors=create
 
 | File | Items | Contents |
 |---|---:|---|
-| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 313 | **Start here.** Formats, kinds, XFN, edge cases — no plugin-specific meta |
-| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 73 | Same, without the 240-post matrix |
-| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 313 | Adds post meta specific plugins read — see [Extended layer](#extended-layer) |
+| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 489 | **Start here.** Formats, kinds, XFN, edge cases — no plugin-specific meta |
+| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 89 | Same, without the 400-post matrix |
+| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 489 | Adds post meta specific plugins read — see [Extended layer](#extended-layer) |
 
 ## What's covered
 
@@ -28,13 +28,14 @@ wp import indieweb-test-data.xml --authors=create
 Content is shaped so format-dependent logic has something real to work on: the quote post has a
 `<cite>`, the image post has a caption and alt text, the link post points somewhere.
 
-**24 post kinds** on the `kind` taxonomy — acquisition, article, bookmark, checkin, drink, eat,
-event, favorite, jam, like, listen, mood, note, photo, play, read, recipe, reply, repost, review,
-rsvp, video, watch, wish.
+**40 post kinds** on the `kind` taxonomy — acquisition, article, audio, bookmark, checkin,
+chicken, collection, comics, craft, drink, eat, event, exercise, favorite, follow, issue,
+itinerary, jam, like, listen, mood, note, photo, play, presentation, question, quote, read,
+recipe, reply, repost, review, rsvp, sleep, tag, trip, video, watch, weather, wish.
 
 > The `kind` taxonomy slug is shared by more than one plugin, so this data imports for any of them.
 
-**The full 10 × 24 matrix** — 240 posts covering every format/kind pair. Verbose on purpose: when two
+**The full 10 × 40 matrix** — 400 posts covering every format/kind pair. Verbose on purpose: when two
 plugins both render a post, their interaction lives in the cross-product, and a bug that only appears
 for `quote` + `like` is invisible to testing either dimension alone.
 
