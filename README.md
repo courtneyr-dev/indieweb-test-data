@@ -18,9 +18,9 @@ wp import indieweb-test-data.xml --authors=create
 
 | File | Items | Contents |
 |---|---:|---|
-| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 489 | **Start here.** Formats, kinds, XFN, edge cases — no plugin-specific meta |
-| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 89 | Same, without the 400-post matrix |
-| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 489 | Adds post meta specific plugins read — see [Extended layer](#extended-layer) |
+| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 497 | Formats, kinds, XFN, and edge cases |
+| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 97 | Same, without the 400-post matrix |
+| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 501 | Adds plugin metadata, PKIW cards, and two media attachments |
 
 ## What's covered
 
@@ -43,7 +43,7 @@ for `quote` + `like` is invisible to testing either dimension alone.
 (`friend met`, `spouse met sweetheart`, `colleague co-resident met`). Values from different groups
 combine; values within a group are mutually exclusive.
 
-**16 edge cases** — the section worth reading before you use this:
+**Edge cases** cover the following:
 
 | Case | Why |
 |---|---|
@@ -66,9 +66,61 @@ adds meta that named plugins read:
 | Prefix | Plugin | Adds |
 |---|---|---|
 | `_pfbt_*` | [post-formats-for-block-themes](https://github.com/courtneyr-dev/post-formats-for-block-themes) | manual format assignment, link target URL |
-| `_pkiw_*` | [post-kinds-for-indieweb](https://github.com/courtneyr-dev/post-kinds-for-indieweb) | citation URL/name/author/photo, checkin venue and geo |
+| `_pkiw_*` | [post-kinds-for-indieweb](https://github.com/courtneyr-dev/post-kinds-for-indieweb) | citation, check-in, geo, and Listen card facts |
 
 Adding another plugin means one block in `extended_meta()` — nothing else changes.
+
+### Import the bundled images
+
+On a disposable WordPress install, activate Post Kinds for IndieWeb before
+importing. From this checkout, use WP-CLI to load the two PNGs from `media/`.
+The files import as attachments with captions and alt text. WordPress remaps
+the featured images to those attachments.
+
+```bash
+wp --path=/path/to/disposable-wordpress plugin install wordpress-importer --activate
+wp --path=/path/to/disposable-wordpress import indieweb-test-data-extended.xml \
+  --authors=create --require="$PWD/bin/local-media.php"
+```
+
+The generic exports import through **Tools → Import → WordPress**. For a
+content-only import of the extended export through wp-admin, leave attachment
+downloads off.
+
+### Check visibility and card rendering
+
+| Find the posts by slug | Check |
+|---|---|
+| `edge-listen-public`, `edge-listen-locked` | Both have the same episode facts in the extended export. Signed out, the locked post keeps its title and hides the cover, listen link, and rating on surfaces that enforce PKIW privacy. Use the fixture password `fixture-unlock` on the single post. |
+| `edge-listen-native-card`, `edge-listen-public` | In the extended export, the native block and the metadata-only fixture describe the same episode. Compare them on render paths that support both inputs. |
+| `edge-listen-missing-cover` | The episode still has its title and facts when the cover URL has no file. |
+| `edge-recipe-public`, `edge-recipe-locked` | On a theme with the recipe privacy rules, compare the public card and the locked post in the archive, embed, and single views. |
+
+To exercise the recipe print routes, activate WP Recipe Maker after import and run
+`wp --path=/path/to/disposable-wordpress eval-file bin/recipe-print.php`. The command prints a URL path for each
+fixture. On the courtneyr.dev child theme, signed-out requests to the public
+recipe print, locked recipe print, and a nonexistent recipe print should
+return 200, 404, and 404 respectively.
+
+### Check dates across midnight
+
+`--as-of` anchors four cases to a date you choose. Use a disposable install
+set to **UTC−05:00** to compare its local dates with the stored UTC dates.
+
+```bash
+bin/generate.py --no-matrix --as-of 2027-01-01 > indie-web-year-boundary.xml
+```
+
+| Slug | Expected date or status |
+|---|---|
+| `edge-date-anniversary` | Same month and day in the previous year, or February 28 for a leap-day anchor. |
+| `edge-date-before-midnight` | December 31 at 23:30 local. WordPress stores January 1 at 04:30 UTC. |
+| `edge-date-after-midnight` | January 1 at 00:30 local. WordPress stores January 1 at 05:30 UTC. |
+| `edge-date-scheduled` | January 2 at 09:00 local. Generate with today's date to verify it remains scheduled after import. |
+
+The checked-in exports use January 1, 2026 as their fixed anchor. Importer
+status depends on when you run it because WordPress compares publish dates to
+its clock.
 
 ## Regenerating
 
@@ -114,8 +166,9 @@ wp import indieweb-test-data.xml --authors=create
 
 ## Notes
 
-Every URL is `example.test` — reserved by [RFC 6761](https://www.rfc-editor.org/rfc/rfc6761) and
-guaranteed not to resolve. Nothing here reaches the network on import.
+Synthetic media uses `example.test`, a reserved domain. The extended import
+command above loads its bundled images from disk. Some content deliberately
+references unavailable media to exercise fallback behavior.
 
 Import into a **disposable site**. This is test content, not a starter kit.
 

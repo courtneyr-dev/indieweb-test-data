@@ -22,15 +22,25 @@ Usage
 
 import argparse
 import csv
-import html
+import json
 import sys
-from datetime import datetime, timedelta
+from calendar import monthrange
+from datetime import date, datetime, time, timedelta, timezone
+from itertools import count
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-BASE = datetime(2026, 1, 1, 9, 0, 0)
-_uid = [1000]
+BASE = datetime(2026, 1, 1, 9, tzinfo=timezone.utc)
+FIXTURE_ZONE = timezone(timedelta(hours=-5))
+UPLOADS = "https://example.test/wp-content/uploads/indieweb-fixtures"
+COVER_ID = 3001
+MEDIA = (
+    (COVER_ID, "indieweb-night-signal.png", "Night Signal cover",
+     "A yellow moon above a navy skyline", "Cover art for the fictional Night Signal episode."),
+    (3002, "indieweb-tomato-soup.png", "Tomato soup",
+     "A red bowl of tomato soup on a pale table", "Tomato soup for the fictional recipe."),
+)
 
 
 def load(name):
@@ -48,11 +58,6 @@ XFN = [r["value"] for r in XFN_ROWS]
 XFN_GROUP = {r["value"]: r["group"] for r in XFN_ROWS}
 
 
-def nid():
-    _uid[0] += 1
-    return _uid[0]
-
-
 def cd(s):
     return f"<![CDATA[{s}]]>"
 
@@ -62,12 +67,14 @@ def meta_xml(key, value):
             f"\t\t\t<wp:meta_value>{cd(value)}</wp:meta_value>\n\t\t</wp:postmeta>\n")
 
 
-def item(title, content, *, slug=None, fmt=None, kind=None, metas=None,
-         excerpt="", offset_days=0, status="publish"):
-    pid = nid()
-    slug = slug or f"item-{pid}"
-    d = BASE + timedelta(days=offset_days, minutes=pid % 600)
-    ds, pub = d.strftime("%Y-%m-%d %H:%M:%S"), d.strftime("%a, %d %b %Y %H:%M:%S +0000")
+def render_item(title, content, *, pid, slug, fmt=None, kind=None, metas=None,
+                excerpt="", offset_days=0, status="publish", password="",
+                local_date=None, attachment_url=None):
+    posted = local_date or BASE + timedelta(days=offset_days, minutes=pid % 600)
+    utc = posted.astimezone(timezone.utc)
+    ds = posted.strftime("%Y-%m-%d %H:%M:%S")
+    gmt = utc.strftime("%Y-%m-%d %H:%M:%S")
+    pub = utc.strftime("%a, %d %b %Y %H:%M:%S +0000")
     lines = [
         "\t<item>",
         f"\t\t<title>{cd(title)}</title>",
@@ -80,17 +87,20 @@ def item(title, content, *, slug=None, fmt=None, kind=None, metas=None,
         f"\t\t<excerpt:encoded>{cd(excerpt)}</excerpt:encoded>",
         f"\t\t<wp:post_id>{pid}</wp:post_id>",
         f"\t\t<wp:post_date>{cd(ds)}</wp:post_date>",
-        f"\t\t<wp:post_date_gmt>{cd(ds)}</wp:post_date_gmt>",
+        f"\t\t<wp:post_date_gmt>{cd(gmt)}</wp:post_date_gmt>",
         f"\t\t<wp:comment_status>{cd('open')}</wp:comment_status>",
         f"\t\t<wp:ping_status>{cd('open')}</wp:ping_status>",
         f"\t\t<wp:post_name>{cd(slug)}</wp:post_name>",
         f"\t\t<wp:status>{cd(status)}</wp:status>",
         "\t\t<wp:post_parent>0</wp:post_parent>",
         "\t\t<wp:menu_order>0</wp:menu_order>",
-        f"\t\t<wp:post_type>{cd('post')}</wp:post_type>",
-        "\t\t<wp:post_password></wp:post_password>",
+        f"\t\t<wp:post_type>{cd('attachment' if attachment_url else 'post')}</wp:post_type>",
+        (f"\t\t<wp:post_password>{cd(password)}</wp:post_password>" if password
+         else "\t\t<wp:post_password></wp:post_password>"),
         "\t\t<wp:is_sticky>0</wp:is_sticky>",
     ]
+    if attachment_url:
+        lines.append(f"\t\t<wp:attachment_url>{cd(attachment_url)}</wp:attachment_url>")
     if fmt and fmt != "standard":
         lines.append(f'\t\t<category domain="post_format" nicename="post-format-{fmt}">'
                      f'{cd("Post format " + fmt)}</category>')
@@ -186,8 +196,12 @@ def extended_meta(fmt=None, kind=None):
 
 # --- Build -------------------------------------------------------------------
 
-def build(layer="generic", matrix=True):
+def build(layer="generic", matrix=True, as_of=BASE.date()):
     ext = layer == "extended"
+    ids = count(1001)
+
+    def item(title, content, **fields):
+        return render_item(title, content, pid=next(ids), **fields)
     def M(fmt=None, kind=None):
         return extended_meta(fmt, kind) if ext else {}
 
@@ -284,6 +298,64 @@ def build(layer="generic", matrix=True):
                       '<a href="https://example.test/" rel="me">home</a></p><!-- /wp:paragraph -->',
                       slug="edge-xfn-me-rel", offset_days=134))
 
+    if ext:
+        for media_id, filename, title, alt, caption in MEDIA:
+            items.append(render_item(
+                title, "", pid=media_id, slug=Path(filename).stem, status="inherit",
+                attachment_url=f"{UPLOADS}/{filename}", excerpt=caption,
+                metas={"_wp_attachment_image_alt": alt}))
+
+    listen_meta = {
+        "_pkiw_listen_track": "Night Signal",
+        "_pkiw_listen_artist": "Lakeside Radio",
+        "_pkiw_listen_album": "Lakeside Radio",
+        "_pkiw_listen_media_type": "podcast",
+        "_pkiw_listen_url": "https://example.test/listen/night-signal/",
+        "_pkiw_listen_rating": "4",
+        "_thumbnail_id": str(COVER_ID),
+    }
+    notes = "<!-- wp:paragraph --><p>Fixture notes for Night Signal.</p><!-- /wp:paragraph -->"
+    for kind, title, content, meta in (
+        ("listen", "Night Signal", notes, listen_meta),
+        ("recipe", "Tomato soup", "<!-- wp:paragraph --><p>Fixture recipe notes for tomato soup.</p><!-- /wp:paragraph -->",
+         {"_thumbnail_id": str(MEDIA[1][0])}),
+    ):
+        for visibility, password in (("public", ""), ("locked", "fixture-unlock")):
+            items.append(item(
+                f"{title} ({visibility})", content, slug=f"edge-{kind}-{visibility}",
+                kind=kind, metas=meta if ext else None, password=password, offset_days=135))
+
+    if ext:
+        attrs = {
+            "trackTitle": "Night Signal",
+            "artistName": "Lakeside Radio",
+            "albumTitle": "Lakeside Radio",
+            "mediaType": "podcast",
+            "listenUrl": listen_meta["_pkiw_listen_url"],
+            "rating": 4,
+        }
+        card = f"<!-- wp:post-kinds-indieweb/listen-card {json.dumps(attrs)} /-->"
+        items.append(item(
+            "Night Signal (native card)", card + notes, kind="listen", slug="edge-listen-native-card",
+            metas={"_thumbnail_id": str(COVER_ID)}, offset_days=136))
+        missing = dict(attrs, coverImage=f"{UPLOADS}/missing-cover.png")
+        items.append(item(
+            "Night Signal (missing cover)", f"<!-- wp:post-kinds-indieweb/listen-card {json.dumps(missing)} /-->" + notes,
+            kind="listen", slug="edge-listen-missing-cover", offset_days=136))
+
+    previous_year = as_of.year - 1
+    anniversary = as_of.replace(
+        year=previous_year, day=min(as_of.day, monthrange(previous_year, as_of.month)[1]))
+    for slug, title, day, at, status in (
+        ("edge-date-anniversary", "Date: previous-year anniversary", anniversary, time(12), "publish"),
+        ("edge-date-before-midnight", "Date: before local midnight", as_of - timedelta(days=1), time(23, 30), "publish"),
+        ("edge-date-after-midnight", "Date: after local midnight", as_of, time(0, 30), "publish"),
+        ("edge-date-scheduled", "Date: scheduled for tomorrow", as_of + timedelta(days=1), time(9), "future"),
+    ):
+        items.append(item(
+            title, notes, slug=slug, kind="listen", status=status,
+            local_date=datetime.combine(day, at, tzinfo=FIXTURE_ZONE)))
+
     terms = "".join(
         f"\t<wp:term><wp:term_id>{2000+i}</wp:term_id>"
         f"<wp:term_taxonomy>{cd('kind')}</wp:term_taxonomy>"
@@ -328,5 +400,9 @@ if __name__ == "__main__":
     ap.add_argument("--layer", choices=("generic", "extended"), default="generic")
     ap.add_argument("--no-matrix", action="store_true",
                     help="skip the format x kind cross-product")
+    ap.add_argument("--as-of", type=date.fromisoformat, default=BASE.date(), metavar="YYYY-MM-DD",
+                    help="anchor the four date fixtures (default: %(default)s)")
     a = ap.parse_args()
-    sys.stdout.write(build(layer=a.layer, matrix=not a.no_matrix))
+    if not 2 <= a.as_of.year <= 9998:
+        ap.error("--as-of must allow dates in the previous year and the following day")
+    sys.stdout.write(build(layer=a.layer, matrix=not a.no_matrix, as_of=a.as_of))
