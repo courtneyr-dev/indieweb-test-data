@@ -1,0 +1,24 @@
+{
+  "id": "format-gallery-block-local-images",
+  "postId": 5007,
+  "title": "Gallery with two local shapes",
+  "format": "gallery",
+  "attachments": [
+    {
+      "id": 5101,
+      "file": "fixture-yellow-square.png",
+      "title": "Yellow square",
+      "mime": "image/png",
+      "alt": "A yellow square on a navy background",
+      "caption": "Yellow square, first gallery image."
+    },
+    {
+      "id": 5102,
+      "file": "fixture-cyan-stripes.png",
+      "title": "Cyan stripes",
+      "mime": "image/png",
+      "alt": "Two cyan stripes on a navy background",
+      "caption": "Cyan stripes, second gallery image."
+    }
+  ]
+}

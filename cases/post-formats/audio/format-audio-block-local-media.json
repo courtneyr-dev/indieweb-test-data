@@ -1,0 +1,15 @@
+{
+  "id": "format-audio-block-local-media",
+  "postId": 5009,
+  "title": "Audio with a local tone",
+  "format": "audio",
+  "attachments": [
+    {
+      "id": 5103,
+      "file": "fixture-440hz.mp3",
+      "title": "440 Hz test tone",
+      "mime": "audio/mpeg",
+      "caption": "A 1.5-second sine tone at 440 Hz."
+    }
+  ]
+}

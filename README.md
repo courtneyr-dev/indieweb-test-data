@@ -18,9 +18,9 @@ wp import indieweb-test-data.xml --authors=create
 
 | File | Items | Contents |
 |---|---:|---|
-| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 497 | Formats, kinds, XFN, and edge cases |
-| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 97 | Same, without the 400-post matrix |
-| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 501 | Adds plugin metadata, PKIW cards, and two media attachments |
+| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 512 | Formats, kinds, XFN, and edge cases |
+| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 112 | Same, without the 400-post matrix |
+| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 516 | Adds plugin metadata, PKIW cards, and two more media attachments |
 
 ## What's covered
 
@@ -40,8 +40,8 @@ plugins both render a post, their interaction lives in the cross-product, and a 
 for `quote` + `like` is invisible to testing either dimension alone.
 
 **18 XFN values** across all seven groups, each on its own, plus seven multi-group combinations
-(`friend met`, `spouse met sweetheart`, `colleague co-resident met`). Values from different groups
-combine; values within a group are mutually exclusive.
+(`friend met`, `spouse met sweetheart`, `colleague co-resident met`). Friendship, geography, and family each allow one value. Both professional
+values can appear together. `me` excludes other XFN values on the same link.
 
 **Edge cases** cover the following:
 
@@ -58,6 +58,43 @@ combine; values within a group are mutually exclusive.
 | XFN with an unknown `rel` token | Graceful handling of invalid input |
 | `rel="me"` on external profiles | Identity consolidation |
 
+## XFN and post-format cases
+
+The [XFN cases](cases/xfn/) cover inline links, buttons, embeds, and classic HTML.
+The [post-format cases](cases/post-formats/) cover a block Gallery, classic Quote,
+block Audio, and block Video. Each case has a manifest named `<id>.json`, a
+same-stem HTML source, and `<id>.expected.json` with the steps and assertions.
+Treat rel token lists as sets. Repeat the editor steps on fresh imports for
+Administrator and Author, and assign the Author their own fixture post before
+the run.
+
+All three exports contain these ten posts and their five attachments. To
+import those attachments with the small export, use this checkout and the
+[local media hook](bin/local-media.php) on a disposable WordPress install.
+
+```bash
+wp plugin install wordpress-importer --activate
+wp import indieweb-test-data-small.xml --authors=create --require="$PWD/bin/local-media.php"
+```
+
+For the pinned headless Playground import, put local copies of
+`link-extension-for-xfn.1.1.3.zip` and `post-formats-for-block-themes.1.1.12.zip`
+in a directory. Each ZIP must contain the built plugin in its usual
+plugin-slug folder. The Blueprint uses WordPress 7.1.5, PHP 8.3, and the
+Twenty Twenty-Five 1.5 theme shipped with that core release.
+
+```bash
+npx @wp-playground/cli@3.1.65 run-blueprint --wp=7.1.5 \
+  --blueprint=blueprints/first-ten.json \
+  --mount-dir "$PWD" /fixtures \
+  --mount-dir "/absolute/path/to/plugin-zips" /fixture-plugins
+```
+
+The [Blueprint](blueprints/first-ten.json) activates both local plugins
+and checks the imported posts, raw HTML, format terms, and attachment files.
+The expectation files describe further editor and playback checks.
+See the [synthetic media provenance and license](media/README.md).
+
 ## Extended layer
 
 The generic files carry no plugin-specific post meta, so they work anywhere. The **extended** file
@@ -70,12 +107,12 @@ adds meta that named plugins read:
 
 Adding another plugin means one block in `extended_meta()` — nothing else changes.
 
-### Import the bundled images
+### Import the extended export with bundled media
 
 On a disposable WordPress install, activate Post Kinds for IndieWeb before
-importing. From this checkout, use WP-CLI to load the two PNGs from `media/`.
-The files import as attachments with captions and alt text. WordPress remaps
-the featured images to those attachments.
+importing. From this checkout, use WP-CLI to load the bundled files from
+`media/`. The two extra PNGs import with captions and alt text. WordPress
+remaps the featured images to those attachments.
 
 ```bash
 wp --path=/path/to/disposable-wordpress plugin install wordpress-importer --activate
@@ -83,9 +120,8 @@ wp --path=/path/to/disposable-wordpress import indieweb-test-data-extended.xml \
   --authors=create --require="$PWD/bin/local-media.php"
 ```
 
-The generic exports import through **Tools → Import → WordPress**. For a
-content-only import of the extended export through wp-admin, leave attachment
-downloads off.
+For a content-only import through **Tools → Import → WordPress**, leave
+attachment downloads off.
 
 ### Check visibility and card rendering
 

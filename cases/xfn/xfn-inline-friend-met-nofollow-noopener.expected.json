@@ -1,0 +1,76 @@
+{
+  "id": "xfn-inline-friend-met-nofollow-noopener",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Open Link → Advanced. Clear Met, save, then reopen.",
+    "Select Met again and repeat save and reload to restore the import token set."
+  ],
+  "assertions": {
+    "links": [
+      {
+        "url": "https://example.test/people/anwen-quill/",
+        "selector": "p a[href=\"https://example.test/people/anwen-quill/\"]",
+        "import": {
+          "rel": [
+            "friend",
+            "met",
+            "nofollow",
+            "noopener"
+          ],
+          "xfn": [
+            "friend",
+            "met"
+          ],
+          "other": [
+            "nofollow",
+            "noopener"
+          ]
+        },
+        "afterSave": {
+          "rel": [
+            "friend",
+            "nofollow",
+            "noopener"
+          ]
+        },
+        "afterReload": {
+          "xfn": [
+            "friend"
+          ]
+        },
+        "render": {
+          "rel": [
+            "friend",
+            "nofollow",
+            "noopener"
+          ]
+        },
+        "afterRestore": {
+          "rel": [
+            "friend",
+            "met",
+            "nofollow",
+            "noopener"
+          ],
+          "xfn": [
+            "friend",
+            "met"
+          ]
+        }
+      }
+    ]
+  }
+}

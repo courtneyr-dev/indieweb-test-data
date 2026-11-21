@@ -1,0 +1,57 @@
+{
+  "id": "format-audio-block-local-media",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Import with the bundled media hook. Save a title edit and reopen.",
+    "Play the audio from the rendered post."
+  ],
+  "assertions": {
+    "afterImport": {
+      "term": "post-format-audio",
+      "blocks": [
+        "core/audio"
+      ]
+    },
+    "afterReload": {
+      "term": "post-format-audio",
+      "blocks": [
+        "core/audio"
+      ],
+      "valid": true
+    },
+    "render": {
+      "postClasses": [
+        "format-audio",
+        "pfbt-format-audio"
+      ],
+      "template": "Theme default with plugin format templates disabled."
+    },
+    "attachments": [
+      {
+        "file": "fixture-440hz.mp3",
+        "mime": "audio/mpeg",
+        "url": "Local uploads URL"
+      }
+    ],
+    "playback": {
+      "selector": "audio",
+      "durationSeconds": 1.5,
+      "toleranceSeconds": 0.12,
+      "advances": true,
+      "caption": "A 1.5-second sine tone at 440 Hz."
+    }
+  }
+}

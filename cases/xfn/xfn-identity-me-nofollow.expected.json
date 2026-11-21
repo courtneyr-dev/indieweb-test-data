@@ -1,0 +1,90 @@
+{
+  "id": "xfn-identity-me-nofollow",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Open Link → Advanced for the first link. Confirm Me, save an edit to the surrounding text, then reopen."
+  ],
+  "assertions": {
+    "links": [
+      {
+        "url": "https://example.test/people/berin-moth/",
+        "selector": "p a[href=\"https://example.test/people/berin-moth/\"]",
+        "import": {
+          "rel": [
+            "me",
+            "nofollow"
+          ],
+          "xfn": [
+            "me"
+          ],
+          "other": [
+            "nofollow"
+          ]
+        },
+        "afterSave": {
+          "rel": [
+            "me",
+            "nofollow"
+          ]
+        },
+        "afterReload": {
+          "xfn": [
+            "me"
+          ]
+        },
+        "render": {
+          "rel": [
+            "me",
+            "nofollow"
+          ]
+        }
+      },
+      {
+        "url": "https://example.test/people/cyra-flint/",
+        "selector": "p a[href=\"https://example.test/people/cyra-flint/\"]",
+        "import": {
+          "rel": [
+            "friend",
+            "noopener"
+          ],
+          "xfn": [
+            "friend"
+          ],
+          "other": [
+            "noopener"
+          ]
+        },
+        "afterSave": {
+          "rel": [
+            "friend",
+            "noopener"
+          ]
+        },
+        "afterReload": {
+          "xfn": [
+            "friend"
+          ]
+        },
+        "render": {
+          "rel": [
+            "friend",
+            "noopener"
+          ]
+        }
+      }
+    ]
+  }
+}

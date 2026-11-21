@@ -1,0 +1,54 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "7.1.5"
+  },
+  "features": {
+    "networking": false
+  },
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "vfs",
+        "path": "/fixture-plugins/link-extension-for-xfn.1.1.3.zip"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "vfs",
+        "path": "/fixture-plugins/post-formats-for-block-themes.1.1.12.zip"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "activateTheme",
+      "themeFolderName": "twentytwentyfive"
+    },
+    {
+      "step": "writeFile",
+      "path": "/wordpress/wp-content/mu-plugins/indieweb-test-data.php",
+      "data": "<?php\nrequire '/fixtures/bin/local-media.php';\nadd_filter( 'pre_oembed_result', static function ( $result, $url ) {\n    if ( 'https://example.test/embeds/lantern-demo/' === $url ) {\n        return '<p>Lantern model</p>';\n    }\n    return $result;\n}, 10, 2 );\n"
+    },
+    {
+      "step": "importWxr",
+      "file": {
+        "resource": "vfs",
+        "path": "/fixtures/indieweb-test-data-small.xml"
+      },
+      "fetchAttachments": true,
+      "rewriteUrls": false
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require '/fixtures/bin/check-import.php';"
+    }
+  ]
+}

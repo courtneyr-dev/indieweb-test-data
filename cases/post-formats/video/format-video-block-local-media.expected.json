@@ -1,0 +1,69 @@
+{
+  "id": "format-video-block-local-media",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Import with the bundled media hook. Save a title edit and reopen.",
+    "Play the video from the rendered post and enable English captions."
+  ],
+  "assertions": {
+    "afterImport": {
+      "term": "post-format-video",
+      "blocks": [
+        "core/video"
+      ]
+    },
+    "afterReload": {
+      "term": "post-format-video",
+      "blocks": [
+        "core/video"
+      ],
+      "valid": true
+    },
+    "render": {
+      "postClasses": [
+        "format-video",
+        "pfbt-format-video"
+      ],
+      "template": "Theme default with plugin format templates disabled."
+    },
+    "attachments": [
+      {
+        "file": "fixture-color-bars.mp4",
+        "mime": "video/mp4",
+        "url": "Local uploads URL"
+      },
+      {
+        "file": "fixture-color-bars-en.vtt",
+        "mime": "text/vtt",
+        "url": "Local uploads URL"
+      }
+    ],
+    "playback": {
+      "selector": "video",
+      "durationSeconds": 1.5,
+      "toleranceSeconds": 0.12,
+      "advances": true,
+      "silent": true,
+      "caption": "Silent color bars for 1.5 seconds.",
+      "track": {
+        "kind": "captions",
+        "language": "en",
+        "label": "English",
+        "cue": "[Silent color bars]"
+      }
+    }
+  }
+}

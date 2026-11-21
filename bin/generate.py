@@ -194,6 +194,30 @@ def extended_meta(fmt=None, kind=None):
     return m
 
 
+def case_items(extended):
+    manifests = sorted((ROOT / "cases").rglob("*.json"))
+    cases = [
+        (path, json.loads(path.read_text(encoding="utf-8")))
+        for path in manifests if not path.name.endswith(".expected.json")
+    ]
+    for path, case in sorted(cases, key=lambda entry: entry[1]["postId"]):
+        for media in case.get("attachments", []):
+            alt = media.get("alt")
+            yield render_item(
+                media["title"], "", pid=media["id"], slug=Path(media["file"]).stem,
+                status="inherit", attachment_url=f'{UPLOADS}/{media["file"]}',
+                excerpt=media.get("caption", ""),
+                metas={"_wp_attachment_image_alt": alt} if alt else None,
+            )
+
+        fmt = case["format"]
+        yield render_item(
+            case["title"], path.with_suffix(".html").read_text(encoding="utf-8"),
+            pid=case["postId"], slug=case["id"], fmt=fmt,
+            metas=extended_meta(fmt, None) if extended else None,
+        )
+
+
 # --- Build -------------------------------------------------------------------
 
 def build(layer="generic", matrix=True, as_of=BASE.date()):
@@ -355,6 +379,8 @@ def build(layer="generic", matrix=True, as_of=BASE.date()):
         items.append(item(
             title, notes, slug=slug, kind="listen", status=status,
             local_date=datetime.combine(day, at, tzinfo=FIXTURE_ZONE)))
+
+    items.extend(case_items(ext))
 
     terms = "".join(
         f"\t<wp:term><wp:term_id>{2000+i}</wp:term_id>"
