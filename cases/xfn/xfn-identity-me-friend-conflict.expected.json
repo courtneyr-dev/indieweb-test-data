@@ -16,9 +16,13 @@
   ],
   "operations": [
     "Inspect raw imported content before editing.",
-    "Submit the original XFN values to validation and expect a conflict.",
-    "Open Link → Advanced. Confirm the conflict is flagged and resolve it by clearing Friend. Save, then reopen."
+    "Submit the original XFN values to validation and compare the result with the XFN 1.1 expectation and the known validator gap.",
+    "Open Link → Advanced. Inspect the selected identity and friendship values, then clear Friend manually. Save, then reopen."
   ],
+  "known_gaps": {
+    "validator": "XFN 1.1.3 accepts the raw me friend pair.",
+    "editor": "The XFN 1.1.3 Link Advanced panel code builds ordinary selection controls for me and friend without a conflict indicator. Browser behavior remains unverified."
+  },
   "assertions": {
     "links": [
       {
@@ -57,15 +61,15 @@
         },
         "validation": {
           "valid": false,
-          "reason": "me excludes every other XFN value"
+          "reason": "XFN 1.1 makes me exclusive of every other XFN value",
+          "specification": "https://gmpg.org/xfn/11"
         },
         "beforeEdit": {
           "storedRel": [
             "me",
             "friend",
             "nofollow"
-          ],
-          "editor": "Show the conflicting imported values and require an explicit choice when editing this link."
+          ]
         }
       }
     ]

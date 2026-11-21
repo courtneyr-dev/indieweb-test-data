@@ -45,6 +45,10 @@ foreach ( $manifests as $path ) {
 		$data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
 		fixture_assert( $data['Version'] === $version, "Wrong version for $slug." );
 	}
+	if ( isset( $case['setup']['option'] ) ) {
+		fixture_assert( get_option( $case['setup']['option'] ) === $case['setup']['value'],
+			"Missing setup option for $id." );
+	}
 
 	$post = get_page_by_path( $id, OBJECT, 'post' );
 	fixture_assert( $post instanceof WP_Post, "Missing post $id." );

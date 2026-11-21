@@ -160,5 +160,5 @@ jobs:
                       assert attachment.findtext('{*}post_type') == 'attachment'
                       assert attachment.findtext('{*}attachment_url') == prefix + media['file']
                       assert prefix + media['file'] in html
-          print(f'{len(cases)} cases and their expected outcomes match all three WXR exports')
+          print(f'{len(cases)} expectation IDs and required fields checked; case manifests and HTML match all three WXR exports')
           PY

@@ -266,9 +266,15 @@ def build(layer="generic", matrix=True, as_of=BASE.date()):
         (["colleague", "co-resident", "met"], "colleague-coresident-met"),
         (["me"], "me-identity"),
     ]:
-        items.append(item(f"XFN combo: {' '.join(vals)}", xfn_link(vals, label),
+        title = "XFN identity: me" if vals == ["me"] else f"XFN combo: {' '.join(vals)}"
+        excerpt = (
+            "Use at most one value each from friendship, geography, and family. "
+            "Professional and romantic groups allow multiple values. "
+            "Use me without any other XFN value."
+        )
+        items.append(item(title, xfn_link(vals, label),
                           slug=f"xfn-combo-{label}", offset_days=125,
-                          excerpt="Values from different XFN groups combine; within a group they do not."))
+                          excerpt=excerpt))
 
     items.append(item("XFN: many links in one post",
                       "\n".join(xfn_link([v], v) for v in XFN[:8]),

@@ -10,11 +10,15 @@ This fills that gap.
 
 ## Quick start
 
+For a content-only import on a disposable WordPress site, skip attachments.
+
 ```bash
 wp plugin install wordpress-importer --activate
 curl -sLO https://raw.githubusercontent.com/courtneyr-dev/indieweb-test-data/main/indieweb-test-data.xml
-wp import indieweb-test-data.xml --authors=create
+wp import indieweb-test-data.xml --authors=create --skip=attachment
 ```
+
+To import the local attachments too, follow the [bundled media steps](#import-the-cases-with-bundled-media).
 
 | File | Items | Contents |
 |---|---:|---|
@@ -39,9 +43,10 @@ recipe, reply, repost, review, rsvp, sleep, tag, trip, video, watch, weather, wi
 plugins both render a post, their interaction lives in the cross-product, and a bug that only appears
 for `quote` + `like` is invisible to testing either dimension alone.
 
-**18 XFN values** across all seven groups, each on its own, plus seven multi-group combinations
-(`friend met`, `spouse met sweetheart`, `colleague co-resident met`). Friendship, geography, and family each allow one value. Both professional
-values can appear together. `me` excludes other XFN values on the same link.
+**18 XFN values** across all seven groups, each on its own, plus six multi-group combinations
+(`friend met`, `spouse met sweetheart`, `colleague co-resident met`) and a standalone `me` example.
+Use at most one value each from friendship, geography, and family. Professional and romantic groups
+allow multiple values. Use `me` without any other XFN value. [XFN 1.1 profile](https://gmpg.org/xfn/11)
 
 **Edge cases** cover the following:
 
@@ -68,7 +73,14 @@ Treat rel token lists as sets. Repeat the editor steps on fresh imports for
 Administrator and Author, and assign the Author their own fixture post before
 the run.
 
-All three exports contain these ten posts and their five attachments. To
+| Case | Setup or known gap |
+|---|---|
+| `xfn-button-colleague-co-worker` | Before either role starts, an Administrator opens **Settings → Link Extension for XFN**, enables **Inspector Controls**, and saves. Authors lack the `manage_options` capability. The Blueprint enables this option during setup. |
+| `xfn-identity-me-friend-conflict` | XFN 1.1 requires `me` to appear without other XFN values. The XFN 1.1.3 PHP validator accepts `me friend`, and the Link Advanced panel code builds ordinary controls for both values without a conflict indicator. Clear Friend manually during the editor check. |
+
+### Import the cases with bundled media
+
+All three exports contain these ten posts and their five bundled attachments. To
 import those attachments with the small export, use this checkout and the
 [local media hook](bin/local-media.php) on a disposable WordPress install.
 
@@ -191,7 +203,7 @@ curl -sLO https://raw.githubusercontent.com/wpaccessibility/a11y-theme-unit-test
 wp import a11y-theme-unit-test-data.xml --authors=create
 
 curl -sLO https://raw.githubusercontent.com/courtneyr-dev/indieweb-test-data/main/indieweb-test-data.xml
-wp import indieweb-test-data.xml --authors=create
+wp import indieweb-test-data.xml --authors=create --skip=attachment
 ```
 
 | Corpus | Covers |

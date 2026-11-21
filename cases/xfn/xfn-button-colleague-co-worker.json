@@ -2,5 +2,12 @@
   "id": "xfn-button-colleague-co-worker",
   "postId": 5004,
   "title": "Button with both professional relationships",
-  "format": null
+  "format": null,
+  "setup": {
+    "role": "administrator",
+    "option": "xfn_link_extension_options",
+    "value": {
+      "enable_inspector_controls": true
+    }
+  }
 }

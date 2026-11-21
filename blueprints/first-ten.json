@@ -19,6 +19,10 @@
       }
     },
     {
+      "step": "runPHP",
+      "code": "<?php require '/wordpress/wp-load.php'; update_option( 'xfn_link_extension_options', [ 'enable_inspector_controls' => true ] );"
+    },
+    {
       "step": "installPlugin",
       "pluginData": {
         "resource": "vfs",

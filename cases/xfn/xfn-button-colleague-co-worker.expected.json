@@ -15,7 +15,8 @@
     "author"
   ],
   "operations": [
-    "Use the button Inspector to clear Colleague and restore it, then save and reopen."
+    "Before either role runs this case on a fresh import, an Administrator opens Settings → Link Extension for XFN, enables Inspector Controls, and saves. The setting requires manage_options, which the Author role lacks. The Blueprint enables it during setup.",
+    "Select the Button and use its XFN Inspector panel to clear Colleague and restore it, then save and reopen."
   ],
   "assertions": {
     "links": [

@@ -11178,7 +11178,7 @@
 		<guid isPermaLink="false">http://example.test/?p=1469</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/friend-met/" rel="friend met">friend-met</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1469</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:29:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:29:00]]></wp:post_date_gmt>
@@ -11200,7 +11200,7 @@
 		<guid isPermaLink="false">http://example.test/?p=1470</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/friend-met-coworker/" rel="friend met co-worker">friend-met-coworker</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1470</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:30:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:30:00]]></wp:post_date_gmt>
@@ -11222,7 +11222,7 @@
 		<guid isPermaLink="false">http://example.test/?p=1471</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/acquaintance-neighbor/" rel="acquaintance neighbor">acquaintance-neighbor</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1471</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:31:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:31:00]]></wp:post_date_gmt>
@@ -11244,7 +11244,7 @@
 		<guid isPermaLink="false">http://example.test/?p=1472</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/spouse-met-sweetheart/" rel="spouse met sweetheart">spouse-met-sweetheart</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1472</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:32:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:32:00]]></wp:post_date_gmt>
@@ -11266,7 +11266,7 @@
 		<guid isPermaLink="false">http://example.test/?p=1473</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/parent-met/" rel="parent met">parent-met</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1473</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:33:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:33:00]]></wp:post_date_gmt>
@@ -11288,7 +11288,7 @@
 		<guid isPermaLink="false">http://example.test/?p=1474</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/colleague-coresident-met/" rel="colleague co-resident met">colleague-coresident-met</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1474</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:34:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:34:00]]></wp:post_date_gmt>
@@ -11303,14 +11303,14 @@
 		<wp:is_sticky>0</wp:is_sticky>
 	</item>
 	<item>
-		<title><![CDATA[XFN combo: me]]></title>
+		<title><![CDATA[XFN identity: me]]></title>
 		<link>http://example.test/xfn-combo-me-identity/</link>
 		<pubDate>Wed, 06 May 2026 13:35:00 +0000</pubDate>
 		<dc:creator><![CDATA[testbot]]></dc:creator>
 		<guid isPermaLink="false">http://example.test/?p=1475</guid>
 		<description></description>
 		<content:encoded><![CDATA[<!-- wp:paragraph --><p>Someone I know: <a href="https://example.test/people/me-identity/" rel="me">me-identity</a></p><!-- /wp:paragraph -->]]></content:encoded>
-		<excerpt:encoded><![CDATA[Values from different XFN groups combine; within a group they do not.]]></excerpt:encoded>
+		<excerpt:encoded><![CDATA[Use at most one value each from friendship, geography, and family. Professional and romantic groups allow multiple values. Use me without any other XFN value.]]></excerpt:encoded>
 		<wp:post_id>1475</wp:post_id>
 		<wp:post_date><![CDATA[2026-05-06 13:35:00]]></wp:post_date>
 		<wp:post_date_gmt><![CDATA[2026-05-06 13:35:00]]></wp:post_date_gmt>
@@ -12201,8 +12201,8 @@ https://example.test/embeds/lantern-demo/
 		<dc:creator><![CDATA[testbot]]></dc:creator>
 		<guid isPermaLink="false">http://example.test/?p=5010</guid>
 		<description></description>
-		<content:encoded><![CDATA[<!-- wp:video -->
-<figure class="wp-block-video"><video controls src="https://example.test/wp-content/uploads/indieweb-fixtures/fixture-color-bars.mp4"><track src="https://example.test/wp-content/uploads/indieweb-fixtures/fixture-color-bars-en.vtt" kind="captions" srclang="en" label="English"/></video><figcaption class="wp-element-caption">Silent color bars for 1.5 seconds.</figcaption></figure>
+		<content:encoded><![CDATA[<!-- wp:video {"tracks":[{"src":"https://example.test/wp-content/uploads/indieweb-fixtures/fixture-color-bars-en.vtt","label":"English","srcLang":"en","kind":"captions","default":false}]} -->
+<figure class="wp-block-video"><video controls src="https://example.test/wp-content/uploads/indieweb-fixtures/fixture-color-bars.mp4"><track src="https://example.test/wp-content/uploads/indieweb-fixtures/fixture-color-bars-en.vtt" label="English" srclang="en" kind="captions"/></video><figcaption class="wp-element-caption">Silent color bars for 1.5 seconds.</figcaption></figure>
 <!-- /wp:video -->
 ]]></content:encoded>
 		<excerpt:encoded><![CDATA[]]></excerpt:encoded>

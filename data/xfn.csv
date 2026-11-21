@@ -1,5 +1,5 @@
 value,group,notes
-contact,friendship,Values within a group are mutually exclusive
+contact,friendship,Pick at most one friendship value
 acquaintance,friendship,
 friend,friendship,
 met,physical,Have met in person
