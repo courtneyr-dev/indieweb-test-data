@@ -1,0 +1,79 @@
+{
+  "id": "xfn-classic-webmention-custom-rel",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Assign the post to the Author account, and confirm it lacks unfiltered_html. Run the same check on a fresh import as Administrator.",
+    "In the code editor, add met to the existing rel attribute and update the link text. Save, then reopen without converting the post to blocks.",
+    "Inspect the scanner result and compare it with the stored and rendered link. Keep Webmention delivery disabled."
+  ],
+  "assertions": {
+    "links": [
+      {
+        "url": "https://example.test/people/elin-sedge/",
+        "selector": "p a[href=\"https://example.test/people/elin-sedge/\"]",
+        "import": {
+          "rel": [
+            "friend",
+            "webmention",
+            "fixture-custom"
+          ],
+          "xfn": [
+            "friend"
+          ],
+          "other": [
+            "webmention",
+            "fixture-custom"
+          ]
+        },
+        "afterSave": {
+          "rel": [
+            "friend",
+            "met",
+            "webmention",
+            "fixture-custom"
+          ],
+          "scannedXfn": [
+            "friend",
+            "met"
+          ],
+          "sentWebmentions": 0,
+          "scan": {
+            "url": "https://example.test/people/elin-sedge/",
+            "rels": [
+              "friend",
+              "met"
+            ]
+          }
+        },
+        "afterReload": {
+          "xfn": [
+            "friend",
+            "met"
+          ],
+          "surface": "classic HTML via the code editor"
+        },
+        "render": {
+          "rel": [
+            "friend",
+            "met",
+            "webmention",
+            "fixture-custom"
+          ]
+        }
+      }
+    ]
+  }
+}

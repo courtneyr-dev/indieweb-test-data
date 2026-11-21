@@ -1,0 +1,77 @@
+{
+  "id": "xfn-identity-me-friend-conflict",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Inspect raw imported content before editing.",
+    "Submit the original XFN values to validation and compare the result with the XFN 1.1 expectation and the known validator gap.",
+    "Open Link → Advanced. Inspect the selected identity and friendship values, then clear Friend manually. Save, then reopen."
+  ],
+  "known_gaps": {
+    "validator": "XFN 1.1.3 accepts the raw me friend pair.",
+    "editor": "The XFN 1.1.3 Link Advanced panel code builds ordinary selection controls for me and friend without a conflict indicator. Browser behavior remains unverified."
+  },
+  "assertions": {
+    "links": [
+      {
+        "url": "https://example.test/people/daven-reed/",
+        "selector": "p a[href=\"https://example.test/people/daven-reed/\"]",
+        "import": {
+          "rel": [
+            "me",
+            "friend",
+            "nofollow"
+          ],
+          "xfn": [
+            "me",
+            "friend"
+          ],
+          "other": [
+            "nofollow"
+          ]
+        },
+        "afterSave": {
+          "rel": [
+            "me",
+            "nofollow"
+          ]
+        },
+        "afterReload": {
+          "xfn": [
+            "me"
+          ]
+        },
+        "render": {
+          "rel": [
+            "me",
+            "nofollow"
+          ]
+        },
+        "validation": {
+          "valid": false,
+          "reason": "XFN 1.1 makes me exclusive of every other XFN value",
+          "specification": "https://gmpg.org/xfn/11"
+        },
+        "beforeEdit": {
+          "storedRel": [
+            "me",
+            "friend",
+            "nofollow"
+          ]
+        }
+      }
+    ]
+  }
+}

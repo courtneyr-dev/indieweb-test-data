@@ -1,0 +1,58 @@
+{
+  "id": "xfn-button-colleague-co-worker",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Before either role runs this case on a fresh import, an Administrator opens Settings → Link Extension for XFN, enables Inspector Controls, and saves. The setting requires manage_options, which the Author role lacks. The Blueprint enables it during setup.",
+    "Select the Button and use its XFN Inspector panel to clear Colleague and restore it, then save and reopen."
+  ],
+  "assertions": {
+    "links": [
+      {
+        "url": "https://example.test/people/ferran-lark/",
+        "selector": "a.wp-block-button__link[href=\"https://example.test/people/ferran-lark/\"]",
+        "import": {
+          "rel": [
+            "colleague",
+            "co-worker"
+          ],
+          "xfn": [
+            "colleague",
+            "co-worker"
+          ],
+          "other": []
+        },
+        "afterSave": {
+          "rel": [
+            "colleague",
+            "co-worker"
+          ]
+        },
+        "afterReload": {
+          "xfn": [
+            "colleague",
+            "co-worker"
+          ]
+        },
+        "render": {
+          "rel": [
+            "colleague",
+            "co-worker"
+          ]
+        }
+      }
+    ]
+  }
+}

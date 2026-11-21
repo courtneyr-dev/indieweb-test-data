@@ -1,0 +1,21 @@
+{
+  "id": "format-video-block-local-media",
+  "postId": 5010,
+  "title": "Video with local bars and English captions",
+  "format": "video",
+  "attachments": [
+    {
+      "id": 5104,
+      "file": "fixture-color-bars.mp4",
+      "title": "Silent color bars",
+      "mime": "video/mp4",
+      "caption": "Silent color bars for 1.5 seconds."
+    },
+    {
+      "id": 5105,
+      "file": "fixture-color-bars-en.vtt",
+      "title": "English captions for silent color bars",
+      "mime": "text/vtt"
+    }
+  ]
+}

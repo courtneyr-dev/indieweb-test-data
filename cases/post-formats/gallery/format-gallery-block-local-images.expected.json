@@ -1,0 +1,67 @@
+{
+  "id": "format-gallery-block-local-images",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Import with attachment fetching enabled and the bundled media hook loaded.",
+    "Open the Gallery block, edit the title and save. Reopen, then inspect both images in order."
+  ],
+  "assertions": {
+    "afterImport": {
+      "term": "post-format-gallery",
+      "blocks": [
+        "core/gallery",
+        "core/image",
+        "core/image"
+      ]
+    },
+    "afterReload": {
+      "term": "post-format-gallery",
+      "blocks": [
+        "core/gallery",
+        "core/image",
+        "core/image"
+      ],
+      "valid": true
+    },
+    "render": {
+      "postClasses": [
+        "format-gallery",
+        "pfbt-format-gallery"
+      ],
+      "template": "Theme default with plugin format templates disabled."
+    },
+    "attachments": [
+      {
+        "file": "fixture-yellow-square.png",
+        "mime": "image/png",
+        "alt": "A yellow square on a navy background",
+        "caption": "Yellow square, first gallery image.",
+        "renderSelector": ".wp-block-gallery img",
+        "url": "Local uploads URL",
+        "loads": true
+      },
+      {
+        "file": "fixture-cyan-stripes.png",
+        "mime": "image/png",
+        "alt": "Two cyan stripes on a navy background",
+        "caption": "Cyan stripes, second gallery image.",
+        "renderSelector": ".wp-block-gallery img",
+        "url": "Local uploads URL",
+        "loads": true
+      }
+    ]
+  }
+}

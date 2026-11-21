@@ -1,0 +1,68 @@
+{
+  "id": "xfn-embed-friend-met",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Save and reopen the embed with a local oEmbed stub for the fixture URL.",
+    "Render the parsed core/embed block with each supplied HTML input through the render_block filter."
+  ],
+  "assertions": {
+    "url": "https://example.test/embeds/lantern-demo/",
+    "block": "core/embed",
+    "import": {
+      "metadata": {
+        "rel": [
+          "friend",
+          "met"
+        ]
+      }
+    },
+    "afterSave": {
+      "metadata": {
+        "rel": [
+          "friend",
+          "met"
+        ]
+      }
+    },
+    "afterReload": {
+      "xfn": [
+        "friend",
+        "met"
+      ]
+    },
+    "render": [
+      {
+        "input": "<figure class=\"wp-block-embed\"><div class=\"wp-block-embed__wrapper\"><p>Lantern model</p></div></figure>",
+        "selector": "figure.wp-block-embed",
+        "attribute": "data-xfn-rel",
+        "tokens": [
+          "friend",
+          "met"
+        ]
+      },
+      {
+        "input": "<figure class=\"wp-block-embed\"><div class=\"wp-block-embed__wrapper\"><a href=\"https://example.test/embeds/lantern-demo/\" rel=\"nofollow\">Lantern model</a></div></figure>",
+        "selector": "figure.wp-block-embed a[href=\"https://example.test/embeds/lantern-demo/\"]",
+        "attribute": "rel",
+        "tokens": [
+          "friend",
+          "met",
+          "nofollow"
+        ]
+      }
+    ]
+  }
+}
