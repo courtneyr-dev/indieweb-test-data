@@ -1,0 +1,73 @@
+{
+  "id": "xfn-identity-me-friend-conflict",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Inspect raw imported content before editing.",
+    "Submit the original XFN values to validation and expect a conflict.",
+    "Open Link → Advanced. Confirm the conflict is flagged and resolve it by clearing Friend. Save, then reopen."
+  ],
+  "assertions": {
+    "links": [
+      {
+        "url": "https://example.test/people/daven-reed/",
+        "selector": "p a[href=\"https://example.test/people/daven-reed/\"]",
+        "import": {
+          "rel": [
+            "me",
+            "friend",
+            "nofollow"
+          ],
+          "xfn": [
+            "me",
+            "friend"
+          ],
+          "other": [
+            "nofollow"
+          ]
+        },
+        "afterSave": {
+          "rel": [
+            "me",
+            "nofollow"
+          ]
+        },
+        "afterReload": {
+          "xfn": [
+            "me"
+          ]
+        },
+        "render": {
+          "rel": [
+            "me",
+            "nofollow"
+          ]
+        },
+        "validation": {
+          "valid": false,
+          "reason": "me excludes every other XFN value"
+        },
+        "beforeEdit": {
+          "storedRel": [
+            "me",
+            "friend",
+            "nofollow"
+          ],
+          "editor": "Show the conflicting imported values and require an explicit choice when editing this link."
+        }
+      }
+    ]
+  }
+}

@@ -81,8 +81,8 @@ jobs:
 
           media = {item.findtext('{*}post_id'): item for item in extended.values()
                    if item.findtext('{*}post_type') == 'attachment'}
-          assert len(media) == 2
-          for item in media.values():
+          for image_id in ('3001', '3002'):
+              item = media[image_id]
               filename = item.findtext('{*}attachment_url').rsplit('/', 1)[1]
               assert (Path('media') / filename).read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
               assert item.findtext('{http://wordpress.org/export/1.2/excerpt/}encoded')
@@ -111,4 +111,54 @@ jobs:
           assert dates['edge-date-scheduled'].findtext('{*}post_date') == '2027-01-02 09:00:00'
           assert dates['edge-date-anniversary'].findtext('{*}post_date').startswith('2026-01-01')
           print('Visibility pairs, bundled media, PKIW cards, and the repeated year boundary passed')
+          PY
+
+      - name: Case manifests, expectations, and exports
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          for path in Path('.').rglob('*.json'):
+              json.loads(path.read_text(encoding='utf-8'))
+
+          cases = {}
+          for path in Path('cases').rglob('*.json'):
+              if path.name.endswith('.expected.json'):
+                  assert path.with_name(path.name.removesuffix('.expected.json') + '.json').is_file()
+                  continue
+              case = json.loads(path.read_text(encoding='utf-8'))
+              expected = json.loads(path.with_suffix('.expected.json').read_text(encoding='utf-8'))
+              assert case['id'] == expected['id'] == path.stem
+              assert case['id'] not in cases
+              assert expected['roles'] and expected['operations'] and expected['assertions']
+              html = path.with_suffix('.html').read_text(encoding='utf-8')
+              cases[case['id']] = (case, html)
+          assert len(cases) >= 10
+
+          prefix = 'https://example.test/wp-content/uploads/indieweb-fixtures/'
+          for path in Path('.').glob('*.xml'):
+              channel = ET.parse(path).getroot().find('channel')
+              assert channel.findtext('{*}wxr_version') == '1.2'
+              items = channel.findall('item')
+              by_slug = {item.findtext('{*}post_name'): item for item in items}
+              ids = {item.findtext('{*}post_id') for item in items}
+              assert len(ids) == len(by_slug) == len(items)
+              for case, html in cases.values():
+                  post = by_slug[case['id']]
+                  assert post.findtext('{*}post_id') == str(case['postId'])
+                  assert post.findtext('{*}encoded') == html
+                  terms = [term.get('nicename') for term in post.findall('category')
+                           if term.get('domain') == 'post_format']
+                  assert terms == (['post-format-' + case['format']] if case['format'] else [])
+                  for media in case.get('attachments', []):
+                      source = Path('media') / media['file']
+                      attachment = by_slug[source.stem]
+                      assert source.stat().st_size > 0
+                      assert attachment.findtext('{*}post_id') == str(media['id'])
+                      assert attachment.findtext('{*}post_type') == 'attachment'
+                      assert attachment.findtext('{*}attachment_url') == prefix + media['file']
+                      assert prefix + media['file'] in html
+          print(f'{len(cases)} cases and their expected outcomes match all three WXR exports')
           PY
