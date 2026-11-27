@@ -56,6 +56,13 @@ async function checkKindPanel(browser) {
 	const page = await signIn(browser, 'admin');
 	await page.goto(origin + '/wp-admin/post-new.php');
 	await page.waitForFunction(() => window.wp?.plugins?.getPlugin('post-kinds-indieweb-kind-selector'));
+	const guide = page.locator('.components-modal__frame').getByRole('button', { name: 'Close', exact: true });
+	if (await guide.isVisible()) {
+		await guide.click();
+		await guide.waitFor({ state: 'hidden' });
+	} else if (await page.getByRole('dialog').count()) {
+		await page.keyboard.press('Escape');
+	}
 	await page.evaluate(() => {
 		wp.data.dispatch('core/preferences').set('core/edit-post', 'welcomeGuide', false);
 		wp.data.dispatch('core/edit-post').openGeneralSidebar('edit-post/document');
