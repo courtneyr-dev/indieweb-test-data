@@ -5,6 +5,11 @@ on:
     branches: [ main ]
   pull_request:
   workflow_dispatch:
+    inputs:
+      suite:
+        type: choice
+        options: [editor, preview]
+        default: editor
 
 permissions:
   contents: read
@@ -172,6 +177,7 @@ jobs:
           PY
 
   import-playground:
+    if: ${{ github.event.inputs.suite != 'preview' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -230,3 +236,25 @@ jobs:
           done
           curl --fail --silent --show-error --max-time 3 http://127.0.0.1:9400/?rest_route=/ >/dev/null
           NODE_PATH="$browser_tools/node_modules" node bin/check-editor.cjs
+
+  public-previews:
+    if: ${{ github.event.inputs.suite == 'preview' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.3'
+      - name: Boot current public Playgrounds in fresh WordPress instances
+        shell: bash
+        run: |
+          receipts="$(mktemp -d)"
+          export PREVIEW_RECEIPTS="$receipts"
+          node bin/prepare-preview-probes.cjs
+          for blueprint in "$receipts"/*.json; do
+            name="$(basename "$blueprint" .json)"
+            npx --yes @wp-playground/cli@3.1.65 run-blueprint --wp=7.1.5 \
+              --blueprint="$blueprint" --mount-dir "$receipts" /proof
+            grep -Fx "$name passed" "$receipts/$name.ok"
+          done
