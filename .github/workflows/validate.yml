@@ -135,7 +135,15 @@ jobs:
               assert expected['roles'] and expected['operations'] and expected['assertions']
               html = path.with_suffix('.html').read_text(encoding='utf-8')
               cases[case['id']] = (case, html)
-          assert len(cases) >= 10
+          formats = {
+              case['format'] or 'standard' for case, _ in cases.values()
+              if case['id'].startswith('format-')
+          }
+          expected_formats = {
+              'standard', 'aside', 'audio', 'chat', 'gallery',
+              'image', 'link', 'quote', 'status', 'video',
+          }
+          assert formats == expected_formats, f'post format round-trip cases: {expected_formats - formats}'
 
           prefix = 'https://example.test/wp-content/uploads/indieweb-fixtures/'
           for path in Path('.').glob('*.xml'):

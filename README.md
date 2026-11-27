@@ -22,9 +22,9 @@ To import the local attachments too, follow the [bundled media steps](#import-th
 
 | File | Items | Contents |
 |---|---:|---|
-| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 512 | Formats, kinds, XFN, and edge cases |
-| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 112 | Same, without the 400-post matrix |
-| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 516 | Adds plugin metadata, PKIW cards, and two more media attachments |
+| [`indieweb-test-data.xml`](indieweb-test-data.xml) | 519 | Formats, kinds, XFN, and edge cases |
+| [`indieweb-test-data-small.xml`](indieweb-test-data-small.xml) | 119 | Same, without the 400-post matrix |
+| [`indieweb-test-data-extended.xml`](indieweb-test-data-extended.xml) | 523 | Adds plugin metadata, PKIW cards, and two more media attachments |
 
 ## What's covered
 
@@ -66,8 +66,8 @@ allow multiple values. Use `me` without any other XFN value. [XFN 1.1 profile](h
 ## XFN and post-format cases
 
 The [XFN cases](cases/xfn/) cover inline links, buttons, embeds, and classic HTML.
-The [post-format cases](cases/post-formats/) cover a block Gallery, classic Quote,
-block Audio, and block Video. Each case has a manifest named `<id>.json`, a
+The [post-format cases](cases/post-formats/) cover Standard and all nine post
+formats, with block, classic, and bundled media examples. Each case has a manifest named `<id>.json`, a
 same-stem HTML source, and `<id>.expected.json` with the steps and assertions.
 Treat rel token lists as sets. Repeat the editor steps on fresh imports for
 Administrator and Author, and assign the Author their own fixture post before
@@ -80,7 +80,7 @@ the run.
 
 ### Import the cases with bundled media
 
-All three exports contain these ten posts and their five bundled attachments. To
+All three exports contain these 16 posts and their six bundled attachments. To
 import those attachments with the small export, use this checkout and the
 [local media hook](bin/local-media.php) on a disposable WordPress install.
 
