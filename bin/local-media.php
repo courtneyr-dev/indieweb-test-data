@@ -14,6 +14,7 @@ function use_bundled_media( $response, array $args, string $url ) {
 		'indieweb-tomato-soup.png'   => 'image/png',
 		'fixture-yellow-square.png' => 'image/png',
 		'fixture-cyan-stripes.png'  => 'image/png',
+		'fixture-orange-inset.png'  => 'image/png',
 		'fixture-440hz.mp3'         => 'audio/mpeg',
 		'fixture-color-bars.mp4'    => 'video/mp4',
 		'fixture-color-bars-en.vtt' => 'text/vtt',
