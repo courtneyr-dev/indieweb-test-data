@@ -64,6 +64,19 @@ async function checkKindPanel(browser) {
 			wp.data.dispatch('core/editor').toggleEditorPanelOpened(panelName);
 		}
 	});
+	console.log('Kind selector DOM:', await page.evaluate(() => {
+		const panel = document.querySelector('.post-kinds-indieweb-kind-panel');
+		const grid = document.querySelector('.post-kinds-indieweb-kind-grid');
+		const panelName = 'post-kinds-indieweb-kind-selector/post-kinds-indieweb-kind-selector';
+		return {
+			panel: panel?.outerHTML.slice(0, 1300),
+			grid: grid?.outerHTML.slice(0, 300),
+			hiddenAncestor: grid?.closest('[aria-hidden="true"],[inert]')?.className,
+			dialogs: [...document.querySelectorAll('[role="dialog"]')].map((dialog) => dialog.getAttribute('aria-label')),
+			opened: wp.data.select('core/editor').isEditorPanelOpened(panelName),
+			sidebar: wp.data.select('core/edit-post').getActiveGeneralSidebarName(),
+		};
+	}));
 	const grid = page.getByRole('radiogroup', { name: 'Select post kind' });
 	await grid.waitFor({ state: 'visible' });
 	const reply = grid.getByRole('button', { name: 'Reply', exact: true });
