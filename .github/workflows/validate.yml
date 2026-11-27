@@ -218,6 +218,9 @@ jobs:
           wp_fixture plugin install "$FIXTURE_PLUGINS/link-extension-for-xfn.1.1.3.zip" \
             "$FIXTURE_PLUGINS/post-formats-for-block-themes.1.1.12.zip" wordpress-importer --activate
           wp_fixture import "$PWD/indieweb-test-data-small.xml" --authors=create --require="$PWD/bin/local-media.php"
+          author_id="$(wp_fixture user create fixture-author author@example.test --role=author --user_pass="$FIXTURE_PASSWORD" --porcelain)"
+          wp_fixture post list --post_type=post --post_status=publish --format=ids |
+            xargs -r php "$RUNNER_TEMP/wp-cli.phar" --path="$work_site" post update --post_author="$author_id" >/dev/null
           wp_fixture server --host=127.0.0.1 --port=9400 > "$RUNNER_TEMP/wordpress-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true; tail -50 "$RUNNER_TEMP/wordpress-server.log"' EXIT
