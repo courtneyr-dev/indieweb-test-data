@@ -57,6 +57,7 @@ async function checkKindPanel(browser) {
 	await page.goto(origin + '/wp-admin/post-new.php');
 	await page.waitForFunction(() => window.wp?.plugins?.getPlugin('post-kinds-indieweb-kind-selector'));
 	await page.evaluate(() => {
+		wp.data.dispatch('core/preferences').set('core/edit-post', 'welcomeGuide', false);
 		wp.data.dispatch('core/edit-post').openGeneralSidebar('edit-post/document');
 		const panelName = 'post-kinds-indieweb-kind-selector/post-kinds-indieweb-kind-selector';
 		if (!wp.data.select('core/editor').isEditorPanelOpened(panelName)) {
@@ -66,8 +67,8 @@ async function checkKindPanel(browser) {
 	const grid = page.getByRole('radiogroup', { name: 'Select post kind' });
 	await grid.waitFor({ state: 'visible' });
 	const reply = grid.getByRole('button', { name: 'Reply', exact: true });
-	await reply.evaluate((button) => button.click());
-	assert.equal(await reply.getAttribute('aria-pressed'), 'true');
+	await reply.click();
+	await reply.and(grid.getByRole('button', { name: 'Reply', pressed: true, exact: true })).waitFor();
 	await page.waitForFunction(() => wp.data.select('core/block-editor').getBlocks()
 		.some((block) => block.name === 'post-kinds-indieweb/reply-card'));
 	console.log('Verified Post Kind editor panel, Reply selection, and card insertion');
