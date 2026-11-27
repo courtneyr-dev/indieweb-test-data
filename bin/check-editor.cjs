@@ -67,9 +67,9 @@ async function checkEditor(browser, username) {
 		assert.equal(publicPost.content.rendered, post.content.rendered, fixture.id);
 		if (format === 'audio' || format === 'video') {
 			await page.goto(publicPost.link);
-			const player = page.locator(`article ${format}`);
+			const player = page.locator(format);
 			await player.evaluate(async (media) => { await media.play(); });
-			await page.waitForFunction((selector) => document.querySelector(selector)?.currentTime > 0.15, `article ${format}`);
+			await page.waitForFunction((selector) => document.querySelector(selector)?.currentTime > 0.15, format);
 			console.log(`${username} played ${fixture.id}`);
 		}
 		console.log(`${username} saved and reopened ${fixture.id}`);
