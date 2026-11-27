@@ -8,7 +8,7 @@ on:
     inputs:
       suite:
         type: choice
-        options: [editor, preview]
+        options: [editor, preview, pkiw]
         default: editor
 
 permissions:
@@ -202,8 +202,10 @@ jobs:
             --blueprint=blueprints/first-ten.json \
             --mount-dir "$PWD" /fixtures \
             --mount-dir "$plugins" /fixture-plugins
-      - name: Save and reopen all ten formats in the block editor
+      - name: Check the disposable native WordPress editor
         shell: bash
+        env:
+          FIXTURE_SUITE: ${{ github.event.inputs.suite }}
         run: |
           browser_tools="$(mktemp -d)"
           npm install --prefix "$browser_tools" --no-audit --no-fund playwright@1.61.1
@@ -223,6 +225,9 @@ jobs:
           wp_fixture theme activate twentytwentyfive
           wp_fixture plugin install "$FIXTURE_PLUGINS/link-extension-for-xfn.1.1.3.zip" \
             "$FIXTURE_PLUGINS/post-formats-for-block-themes.1.1.12.zip" wordpress-importer --activate
+          if [[ "$FIXTURE_SUITE" == pkiw ]]; then
+            wp_fixture plugin install post-kinds-for-indieweb-in-block-themes --version=1.10.7 --activate
+          fi
           wp_fixture import "$PWD/indieweb-test-data-small.xml" --authors=create --require="$PWD/bin/local-media.php"
           author_id="$(wp_fixture user create fixture-author author@example.test --role=author --user_pass="$FIXTURE_PASSWORD" --porcelain)"
           wp_fixture post list --post_type=post --post_status=publish --format=ids |
@@ -237,6 +242,10 @@ jobs:
           done
           curl --fail --silent --show-error --max-time 3 http://127.0.0.1:9400/?rest_route=/ >/dev/null
           export NODE_PATH="$browser_tools/node_modules"
+          if [[ "$FIXTURE_SUITE" == pkiw ]]; then
+            node bin/check-editor.cjs pkiw
+            exit 0
+          fi
           NODE_RESULT=0
           node bin/check-editor.cjs || NODE_RESULT=$?
           source_plugins="$(mktemp -d)"

@@ -56,9 +56,11 @@ async function checkKindPanel(browser) {
 	const page = await signIn(browser, 'admin');
 	await page.goto(origin + '/wp-admin/post-new.php');
 	await page.waitForFunction(() => window.wp?.plugins?.getPlugin('post-kinds-indieweb-kind-selector'));
-	const panel = page.getByRole('button', { name: 'Post Kind', exact: true });
+	await page.evaluate(() => wp.data.dispatch('core/edit-post').openGeneralSidebar('edit-post/document'));
+	const panel = page.locator('.post-kinds-indieweb-kind-panel');
 	await panel.waitFor({ state: 'visible' });
-	if (await panel.getAttribute('aria-expanded') === 'false') await panel.click();
+	const heading = panel.getByRole('button', { name: /Post Kind/ });
+	if (await heading.getAttribute('aria-expanded') === 'false') await heading.click();
 	console.log('Verified Post Kind editor panel');
 	await page.close();
 }
