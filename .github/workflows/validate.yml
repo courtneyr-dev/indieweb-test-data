@@ -249,6 +249,8 @@ jobs:
             cp -R "$source_plugins/$repo-$commit/." "$work_site/wp-content/plugins/$repo/"
           done
           node bin/check-editor.cjs settings
+          wp_fixture plugin install post-kinds-for-indieweb-in-block-themes --version=1.10.7 --activate
+          node bin/check-editor.cjs pkiw
           exit "$NODE_RESULT"
 
   public-previews:

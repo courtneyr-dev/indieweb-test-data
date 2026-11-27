@@ -10,6 +10,10 @@ const normalizeVoidTags = (html) => html.replace(/(<(?:img|source|track|br|hr)\b
 async function checkFormats() {
 	const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 	try {
+		if (process.argv[2] === 'pkiw') {
+			await checkKindPanel(browser);
+			return;
+		}
 		if (process.argv[2] === 'settings') {
 			await checkSettings(browser);
 			return;
@@ -48,14 +52,32 @@ async function checkSettings(browser) {
 	await page.close();
 }
 
+async function checkKindPanel(browser) {
+	const page = await signIn(browser, 'admin');
+	await page.goto(origin + '/wp-admin/post-new.php');
+	await page.waitForFunction(() => window.wp?.plugins?.getPlugin('post-kinds-indieweb-kind-selector'));
+	const panel = page.getByRole('button', { name: 'Post Kind', exact: true });
+	await panel.waitFor({ state: 'visible' });
+	if (await panel.getAttribute('aria-expanded') === 'false') await panel.click();
+	console.log('Verified Post Kind editor panel');
+	await page.close();
+}
+
+function loadCases() {
+	const folders = fs.readdirSync(root).sort().map((name) => path.join(root, name));
+	folders.push(path.resolve(root, '../xfn'));
+	return folders.flatMap((folder) =>
+		fs.readdirSync(folder).sort()
+			.filter((name) => name.endsWith('.json') && !name.endsWith('.expected.json'))
+			.map((name) => JSON.parse(fs.readFileSync(path.join(folder, name), 'utf8')))
+	);
+}
+
 async function checkEditor(browser, username) {
 	const page = await signIn(browser, username);
 
-	for (const format of fs.readdirSync(root).sort()) {
-		const folder = path.join(root, format);
-		const file = fs.readdirSync(folder).find((name) => name.endsWith('.json') && !name.endsWith('.expected.json'));
-		assert.ok(file, `Missing manifest for ${format}`);
-		const fixture = JSON.parse(fs.readFileSync(path.join(folder, file), 'utf8'));
+	for (const fixture of loadCases()) {
+		const format = fixture.format || 'standard';
 		const query = new URLSearchParams({ slug: fixture.id, _fields: 'id,format,title,content,link' });
 		const response = await page.request.get(origin + '/?rest_route=/wp/v2/posts&' + query);
 		assert.equal(response.status(), 200, fixture.id);
