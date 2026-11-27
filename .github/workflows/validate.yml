@@ -178,7 +178,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24.22.3'
       - name: Import the corpus and verify content and bundled media
         shell: bash
         run: |
@@ -191,7 +191,26 @@ jobs:
           272eb24ff26b235e9acbfb01ae40ed6c4b604c1390153cb811b49c6e24fb38dc  post-formats-for-block-themes.1.1.12.zip
           CHECKSUMS
           cd "$GITHUB_WORKSPACE"
+          printf "FIXTURE_PLUGINS=%s\n" "$plugins" >> "$GITHUB_ENV"
           npx --yes @wp-playground/cli@3.1.65 run-blueprint --wp=7.1.5 \
             --blueprint=blueprints/first-ten.json \
             --mount-dir "$PWD" /fixtures \
             --mount-dir "$plugins" /fixture-plugins
+      - name: Save and reopen all ten formats in the block editor
+        shell: bash
+        run: |
+          browser_tools="$(mktemp -d)"
+          npm install --prefix "$browser_tools" --no-audit --no-fund playwright@1.61.1
+          "$browser_tools/node_modules/.bin/playwright" install --with-deps chromium
+          npx --yes @wp-playground/cli@3.1.65 server --wp=7.1.5 --port=9400 --login \
+            --blueprint=blueprints/first-ten.json \
+            --mount-dir "$PWD" /fixtures \
+            --mount-dir "$FIXTURE_PLUGINS" /fixture-plugins > "$RUNNER_TEMP/playground.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true; tail -50 "$RUNNER_TEMP/playground.log"' EXIT
+          for _ in {1..45}; do
+            if curl --fail --silent --max-time 3 http://127.0.0.1:9400/wp-json/ >/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent --show-error --max-time 3 http://127.0.0.1:9400/wp-json/ >/dev/null
+          NODE_PATH="$browser_tools/node_modules" node bin/check-editor.cjs
