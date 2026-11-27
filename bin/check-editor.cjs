@@ -10,8 +10,11 @@ async function checkFormats() {
 	const browser = await chromium.launch();
 	try {
 		const page = await browser.newPage();
-		await page.goto(origin + '/wp-admin/');
-		assert.match(page.url(), /\/wp-admin\//, 'Playground login failed');
+		await page.goto(origin + '/wp-login.php');
+		await page.locator('#user_login').fill('admin');
+		await page.locator('#user_pass').fill(process.env.FIXTURE_PASSWORD);
+		await page.locator('#wp-submit').click();
+		await page.waitForURL('**/wp-admin/**');
 
 		for (const format of fs.readdirSync(root).sort()) {
 			const folder = path.join(root, format);

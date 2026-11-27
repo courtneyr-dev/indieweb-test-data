@@ -202,8 +202,20 @@ jobs:
           browser_tools="$(mktemp -d)"
           npm install --prefix "$browser_tools" --no-audit --no-fund playwright@1.61.1
           "$browser_tools/node_modules/.bin/playwright" install --with-deps chromium
-          npx --yes @wp-playground/cli@3.1.65 server --wp=7.1.5 --port=9400 --login \
-            --blueprint=blueprints/first-ten.json \
+          FIXTURE_PASSWORD="$(openssl rand -hex 20)"
+          export FIXTURE_PASSWORD
+          node --input-type=commonjs - <<'NODE'
+          const fs = require('node:fs');
+          const blueprint = JSON.parse(fs.readFileSync('blueprints/first-ten.json', 'utf8'));
+          const password = process.env.FIXTURE_PASSWORD;
+          blueprint.steps.push({
+            step: 'runPHP',
+            code: `<?php require '/wordpress/wp-load.php'; wp_set_password('${password}', get_user_by('login', 'admin')->ID);`,
+          });
+          fs.writeFileSync(process.env.RUNNER_TEMP + '/editor-proof.json', JSON.stringify(blueprint));
+          NODE
+          npx --yes @wp-playground/cli@3.1.65 server --wp=7.1.5 --port=9400 \
+            --blueprint="$RUNNER_TEMP/editor-proof.json" \
             --mount-dir "$PWD" /fixtures \
             --mount-dir "$FIXTURE_PLUGINS" /fixture-plugins > "$RUNNER_TEMP/playground.log" 2>&1 &
           server_pid=$!
