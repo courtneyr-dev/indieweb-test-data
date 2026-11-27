@@ -22,7 +22,7 @@ async function checkFormats() {
 			assert.ok(file, `Missing manifest for ${format}`);
 			const fixture = JSON.parse(fs.readFileSync(path.join(folder, file), 'utf8'));
 			const query = new URLSearchParams({ slug: fixture.id, _fields: 'id,format,title,content' });
-			const response = await page.request.get(origin + '/wp-json/wp/v2/posts?' + query);
+			const response = await page.request.get(origin + '/?rest_route=/wp/v2/posts&' + query);
 			assert.equal(response.status(), 200, fixture.id);
 			const [post] = await response.json();
 			assert.ok(post, `Missing imported post ${fixture.id}`);
@@ -53,7 +53,7 @@ async function checkFormats() {
 			assert.equal(reloaded.content, saved.original, `Edited content changed: ${fixture.id}`);
 			assert.equal(reloaded.format || 'standard', format, fixture.id);
 
-			const [publicPost] = await (await page.request.get(origin + '/wp-json/wp/v2/posts?' + query)).json();
+			const [publicPost] = await (await page.request.get(origin + '/?rest_route=/wp/v2/posts&' + query)).json();
 			assert.equal(publicPost.title.rendered, saved.title, fixture.id);
 			assert.equal(publicPost.content.rendered, post.content.rendered, fixture.id);
 			console.log(`Editor saved and reopened ${fixture.id}`);

@@ -204,25 +204,26 @@ jobs:
           "$browser_tools/node_modules/.bin/playwright" install --with-deps chromium
           FIXTURE_PASSWORD="$(openssl rand -hex 20)"
           export FIXTURE_PASSWORD
-          node --input-type=commonjs - <<'NODE'
-          const fs = require('node:fs');
-          const blueprint = JSON.parse(fs.readFileSync('blueprints/first-ten.json', 'utf8'));
-          const password = process.env.FIXTURE_PASSWORD;
-          blueprint.steps.push({
-            step: 'runPHP',
-            code: `<?php require '/wordpress/wp-load.php'; wp_set_password('${password}', get_user_by('login', 'admin')->ID);`,
-          });
-          fs.writeFileSync(process.env.RUNNER_TEMP + '/editor-proof.json', JSON.stringify(blueprint));
-          NODE
-          npx --yes @wp-playground/cli@3.1.65 server --wp=7.1.5 --port=9400 \
-            --blueprint="$RUNNER_TEMP/editor-proof.json" \
-            --mount-dir "$PWD" /fixtures \
-            --mount-dir "$FIXTURE_PLUGINS" /fixture-plugins > "$RUNNER_TEMP/playground.log" 2>&1 &
+          work_site="$(mktemp -d)"
+          curl --fail --silent --show-error --location --max-time 45 \
+            --output "$RUNNER_TEMP/wp-cli.phar" https://github.com/wp-cli/wp-cli/releases/download/v2.12.0/wp-cli-2.12.0.phar
+          wp_fixture() { php "$RUNNER_TEMP/wp-cli.phar" --path="$work_site" "$@"; }
+          sudo systemctl start mysql.service
+          mysql --user=root --password=root --execute='CREATE DATABASE fixtures'
+          wp_fixture core download --version=7.1.5
+          wp_fixture config create --dbname=fixtures --dbuser=root --dbpass=root
+          wp_fixture core install --url=http://127.0.0.1:9400 --title="Disposable fixture site" \
+            --admin_user=admin --admin_email=fixtures@example.test --admin_password="$FIXTURE_PASSWORD" --skip-email
+          wp_fixture theme activate twentytwentyfive
+          wp_fixture plugin install "$FIXTURE_PLUGINS/link-extension-for-xfn.1.1.3.zip" \
+            "$FIXTURE_PLUGINS/post-formats-for-block-themes.1.1.12.zip" wordpress-importer --activate
+          wp_fixture import "$PWD/indieweb-test-data-small.xml" --authors=create --require="$PWD/bin/local-media.php"
+          wp_fixture server --host=127.0.0.1 --port=9400 > "$RUNNER_TEMP/wordpress-server.log" 2>&1 &
           server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true; tail -50 "$RUNNER_TEMP/playground.log"' EXIT
+          trap 'kill "$server_pid" 2>/dev/null || true; tail -50 "$RUNNER_TEMP/wordpress-server.log"' EXIT
           for _ in {1..45}; do
-            if curl --fail --silent --max-time 3 http://127.0.0.1:9400/wp-json/ >/dev/null; then break; fi
+            if curl --fail --silent --max-time 3 http://127.0.0.1:9400/?rest_route=/ >/dev/null; then break; fi
             sleep 2
           done
-          curl --fail --silent --show-error --max-time 3 http://127.0.0.1:9400/wp-json/ >/dev/null
+          curl --fail --silent --show-error --max-time 3 http://127.0.0.1:9400/?rest_route=/ >/dev/null
           NODE_PATH="$browser_tools/node_modules" node bin/check-editor.cjs
