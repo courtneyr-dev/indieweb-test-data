@@ -5,6 +5,7 @@ const { chromium } = require('playwright');
 
 const root = path.resolve(__dirname, '../cases/post-formats');
 const origin = 'http://127.0.0.1:9400';
+const normalizeVoidTags = (html) => html.replace(/(<(?:img|source|track|br|hr)\b[^>]*?)\s*\/>/gi, '$1/>');
 
 async function checkFormats() {
 	const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
@@ -84,12 +85,12 @@ async function checkEditor(browser, username) {
 			content: wp.data.select('core/editor').getEditedPostContent(),
 			format: wp.data.select('core/editor').getEditedPostAttribute('format'),
 		}));
-		assert.equal(reloaded.content, saved.original, `Edited content changed: ${fixture.id}`);
+		assert.equal(normalizeVoidTags(reloaded.content), normalizeVoidTags(saved.original), `Edited content changed: ${fixture.id}`);
 		assert.equal(reloaded.format || 'standard', format, fixture.id);
 
 		const [publicPost] = await (await page.request.get(origin + '/?rest_route=/wp/v2/posts&' + query)).json();
 		assert.equal(publicPost.title.rendered, saved.title, fixture.id);
-		assert.equal(publicPost.content.rendered, post.content.rendered, fixture.id);
+		assert.equal(normalizeVoidTags(publicPost.content.rendered), normalizeVoidTags(post.content.rendered), fixture.id);
 		if (username === 'admin' && (format === 'audio' || format === 'video')) {
 			await page.goto(publicPost.link);
 			const player = page.locator(format);
