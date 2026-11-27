@@ -227,6 +227,7 @@ jobs:
           author_id="$(wp_fixture user create fixture-author author@example.test --role=author --user_pass="$FIXTURE_PASSWORD" --porcelain)"
           wp_fixture post list --post_type=post --post_status=publish --format=ids |
             xargs -r php "$RUNNER_TEMP/wp-cli.phar" --path="$work_site" post update --post_author="$author_id" >/dev/null
+          export PHP_CLI_SERVER_WORKERS=4
           wp_fixture server --host=127.0.0.1 --port=9400 > "$RUNNER_TEMP/wordpress-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true; tail -50 "$RUNNER_TEMP/wordpress-server.log"' EXIT
@@ -235,7 +236,20 @@ jobs:
             sleep 2
           done
           curl --fail --silent --show-error --max-time 3 http://127.0.0.1:9400/?rest_route=/ >/dev/null
-          NODE_PATH="$browser_tools/node_modules" node bin/check-editor.cjs
+          export NODE_PATH="$browser_tools/node_modules"
+          NODE_RESULT=0
+          node bin/check-editor.cjs || NODE_RESULT=$?
+          source_plugins="$(mktemp -d)"
+          for pair in link-extension-for-xfn:6ff295f8f5b23578ad2a1a2d9f3feb34d35a24ae post-formats-for-block-themes:a2bc6e1417922daaaf98b60d136af293ed8347d0; do
+            repo="${pair%:*}"
+            commit="${pair#*:}"
+            curl --fail --silent --show-error --location --max-time 45 \
+              --output "$source_plugins/$repo.zip" "https://codeload.github.com/courtneyr-dev/$repo/zip/$commit"
+            unzip -q "$source_plugins/$repo.zip" -d "$source_plugins"
+            cp -R "$source_plugins/$repo-$commit/." "$work_site/wp-content/plugins/$repo/"
+          done
+          node bin/check-editor.cjs settings
+          exit "$NODE_RESULT"
 
   public-previews:
     if: ${{ github.event.inputs.suite == 'preview' }}

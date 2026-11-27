@@ -9,7 +9,11 @@ const origin = 'http://127.0.0.1:9400';
 async function checkFormats() {
 	const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
 	try {
-		for (const username of ['admin', 'fixture-author']) {
+		if (process.argv[2] === 'settings') {
+			await checkSettings(browser);
+			return;
+		}
+		for (const username of ['fixture-author', 'admin']) {
 			await checkEditor(browser, username);
 		}
 	} finally {
@@ -17,13 +21,34 @@ async function checkFormats() {
 	}
 }
 
-async function checkEditor(browser, username) {
+async function signIn(browser, username) {
 	const page = await browser.newPage();
 	await page.goto(origin + '/wp-login.php');
 	await page.locator('#user_login').fill(username);
 	await page.locator('#user_pass').fill(process.env.FIXTURE_PASSWORD);
 	await page.locator('#wp-submit').click();
 	await page.waitForURL('**/wp-admin/**');
+	return page;
+}
+
+async function checkSettings(browser) {
+	const page = await signIn(browser, 'admin');
+	for (const [settings, name, category] of [
+		['xfn-link-extension', 'XFN relationship test cases', 'xfn'],
+		['pfbt-settings', 'WordPress post format test cases', 'post-formats'],
+	]) {
+		const response = await page.goto(`${origin}/wp-admin/options-general.php?page=${settings}`);
+		assert.equal(response.status(), 200, settings);
+		const link = page.getByRole('link', { name, exact: true });
+		await link.waitFor({ state: 'visible' });
+		assert.equal(await link.getAttribute('href'), `https://github.com/courtneyr-dev/indieweb-test-data/tree/main/cases/${category}`);
+		console.log(`Verified settings link for ${settings}`);
+	}
+	await page.close();
+}
+
+async function checkEditor(browser, username) {
+	const page = await signIn(browser, username);
 
 	for (const format of fs.readdirSync(root).sort()) {
 		const folder = path.join(root, format);
@@ -65,7 +90,7 @@ async function checkEditor(browser, username) {
 		const [publicPost] = await (await page.request.get(origin + '/?rest_route=/wp/v2/posts&' + query)).json();
 		assert.equal(publicPost.title.rendered, saved.title, fixture.id);
 		assert.equal(publicPost.content.rendered, post.content.rendered, fixture.id);
-		if (format === 'audio' || format === 'video') {
+		if (username === 'admin' && (format === 'audio' || format === 'video')) {
 			await page.goto(publicPost.link);
 			const player = page.locator(format);
 			await player.evaluate(async (media) => { await media.play(); });
