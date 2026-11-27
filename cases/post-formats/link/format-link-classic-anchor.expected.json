@@ -1,0 +1,37 @@
+{
+  "id": "format-link-classic-anchor",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Open the imported post and confirm the selected format and content. Keep the content in the Code editor without converting it to blocks.",
+    "Edit the post title, save, and reload.",
+    "Confirm the format and content are preserved on reload and on the public single."
+  ],
+  "assertions": {
+    "afterImport": {
+      "term": "post-format-link",
+      "blocks": []
+    },
+    "afterReload": {
+      "term": "post-format-link",
+      "blocks": [],
+      "valid": true
+    },
+    "render": {
+      "selector": "a[href=\"https://example.test/lantern-route/\"]",
+      "text": "Lantern route map"
+    }
+  }
+}

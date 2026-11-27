@@ -1,0 +1,47 @@
+{
+  "id": "format-image-block-local-caption",
+  "prerequisites": {
+    "wordpress": "7.1.5",
+    "php": "8.3",
+    "theme": "twentytwentyfive",
+    "themeVersion": "1.5",
+    "plugins": {
+      "link-extension-for-xfn": "1.1.3",
+      "post-formats-for-block-themes": "1.1.12"
+    }
+  },
+  "roles": [
+    "administrator",
+    "author"
+  ],
+  "operations": [
+    "Open the imported post and confirm the selected format and content.",
+    "Edit the post title, save, and reload.",
+    "Confirm the format and content are preserved on reload and on the public single.",
+    "Verify the image loads from the imported attachment and its alt text and caption match."
+  ],
+  "assertions": {
+    "afterImport": {
+      "term": "post-format-image",
+      "blocks": [
+        "core/image"
+      ]
+    },
+    "afterReload": {
+      "term": "post-format-image",
+      "blocks": [
+        "core/image"
+      ],
+      "valid": true
+    },
+    "render": {
+      "selector": "figure > figcaption",
+      "text": "Orange inset, single image.",
+      "image": {
+        "selector": "figure > img",
+        "alt": "An orange rectangle centered on a navy background",
+        "attachment": "fixture-orange-inset.png"
+      }
+    }
+  }
+}

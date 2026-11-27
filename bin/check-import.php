@@ -76,4 +76,4 @@ foreach ( $manifests as $path ) {
 	echo "Imported $id\n";
 	++$count;
 }
-fixture_assert( $count === 10, "Expected 10 first-batch cases, imported $count." );
+fixture_assert( $count === 16, "Expected 16 XFN and post-format cases, imported $count." );

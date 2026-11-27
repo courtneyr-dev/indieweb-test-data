@@ -1,0 +1,16 @@
+{
+  "id": "format-image-block-local-caption",
+  "postId": 5014,
+  "title": "Block image with local caption",
+  "format": "image",
+  "attachments": [
+    {
+      "id": 5106,
+      "file": "fixture-orange-inset.png",
+      "title": "Orange inset",
+      "mime": "image/png",
+      "alt": "An orange rectangle centered on a navy background",
+      "caption": "Orange inset, single image."
+    }
+  ]
+}

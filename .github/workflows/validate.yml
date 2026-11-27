@@ -135,7 +135,15 @@ jobs:
               assert expected['roles'] and expected['operations'] and expected['assertions']
               html = path.with_suffix('.html').read_text(encoding='utf-8')
               cases[case['id']] = (case, html)
-          assert len(cases) >= 10
+          formats = {
+              case['format'] or 'standard' for case, _ in cases.values()
+              if case['id'].startswith('format-')
+          }
+          expected_formats = {
+              'standard', 'aside', 'audio', 'chat', 'gallery',
+              'image', 'link', 'quote', 'status', 'video',
+          }
+          assert formats == expected_formats, f'post format round-trip cases: {expected_formats - formats}'
 
           prefix = 'https://example.test/wp-content/uploads/indieweb-fixtures/'
           for path in Path('.').glob('*.xml'):
@@ -162,3 +170,28 @@ jobs:
                       assert prefix + media['file'] in html
           print(f'{len(cases)} expectation IDs and required fields checked; case manifests and HTML match all three WXR exports')
           PY
+
+  import-playground:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Import the corpus and verify content and bundled media
+        shell: bash
+        run: |
+          plugins="$(mktemp -d)"
+          cd "$plugins"
+          curl --fail --silent --show-error --location --max-time 60 --output link-extension-for-xfn.1.1.3.zip https://downloads.wordpress.org/plugin/link-extension-for-xfn.1.1.3.zip
+          curl --fail --silent --show-error --location --max-time 60 --output post-formats-for-block-themes.1.1.12.zip https://downloads.wordpress.org/plugin/post-formats-for-block-themes.1.1.12.zip
+          sha256sum --check <<'CHECKSUMS'
+          09d4c6f826827e6f4cfdb6966cedbdf621d81d9757532686d91a255ede86bbeb  link-extension-for-xfn.1.1.3.zip
+          272eb24ff26b235e9acbfb01ae40ed6c4b604c1390153cb811b49c6e24fb38dc  post-formats-for-block-themes.1.1.12.zip
+          CHECKSUMS
+          cd "$GITHUB_WORKSPACE"
+          npx --yes @wp-playground/cli@3.1.65 run-blueprint --wp=7.1.5 \
+            --blueprint=blueprints/first-ten.json \
+            --mount-dir "$PWD" /fixtures \
+            --mount-dir "$plugins" /fixture-plugins
